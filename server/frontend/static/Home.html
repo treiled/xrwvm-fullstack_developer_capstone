@@ -7,27 +7,21 @@
   <script>
 
 const logout = async () => {
-    const logoutUrl = window.location.origin + "/djangoapp/logout/";
-    try {
-        const username = sessionStorage.getItem('username'); // Retrieve the username from sessionStorage
-        const response = await fetch(logoutUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-        });
-        const result = await response.json();
-        
-        if (result.success) {
-            alert("Logging out " + username + "...");
-            sessionStorage.clear(); // Clear session data
-            window.location.href = window.location.origin; // Redirect to home
-        } else {
-            alert("Logout failed: " + result.error);
-        }
-    } catch (error) {
-        console.error("Error during logout:", error);
-        alert("An error occurred while logging out.");
-    }
-};
+          let logout_url = window.location.origin+"/djangoapp/logout";
+      const res = await fetch(logout_url, {
+        method: "GET",
+      });
+      const json = await res.json();
+      if (json) {
+        let username = sessionStorage.getItem('username');
+        sessionStorage.removeItem('username');
+        window.location.href = window.location.origin;
+        window.location.reload();
+        alert("Logging out "+username+"...")
+      }
+      else {
+        alert("The user could not be logged out.")
+      }
 
     
     let checkSession = ()=>{
