@@ -1,5 +1,5 @@
 # Uncomment the imports below before you add the function code
-# import requests
+import requests  # <-- This was commented out previously
 import os
 from dotenv import load_dotenv
 
@@ -24,11 +24,13 @@ def get_request(endpoint, **kwargs):
     print("GET from {} ".format(request_url))
     try:
         # Call get method of requests library with URL and parameters
-        response = requests.get(request_url)
+        response = requests.get(request_url, timeout=10)  # Added timeout
+        response.raise_for_status()  # Raise exception for 4XX/5XX status codes
         return response.json()
-    except:
-        # If any error occurs
-        print("Network exception occurred")
+    except requests.exceptions.RequestException as e:
+        # Properly handle the exception
+        print(f"Network exception occurred: {str(e)}")
+        return []  # Return empty list or appropriate default value
 
 # def analyze_review_sentiments(text):
 # request_url = sentiment_analyzer_url+"analyze/"+text
@@ -37,19 +39,21 @@ def analyze_review_sentiments(text):
     request_url = sentiment_analyzer_url+"analyze/"+text
     try:
         # Call get method of requests library with URL and parameters
-        response = requests.get(request_url)
+        response = requests.get(request_url, timeout=10)
+        response.raise_for_status()
         return response.json()
-    except Exception as err:
-        print(f"Unexpected {err=}, {type(err)=}")
-        print("Network exception occurred")
+    except requests.exceptions.RequestException as e:
+        print(f"Network exception occurred: {str(e)}")
+        return {"sentiment": "neutral"}  # Default sentiment if analysis fails
 
 # def post_review(data_dict):
 # Add code for posting review
 def post_review(data_dict):
     request_url = backend_url+"/insert_review"
     try:
-        response = requests.post(request_url,json=data_dict)
-        print(response.json())
+        response = requests.post(request_url, json=data_dict, timeout=10)
+        response.raise_for_status()
         return response.json()
-    except:
-        print("Network exception occurred")
+    except requests.exceptions.RequestException as e:
+        print(f"Network exception occurred: {str(e)}")
+        raise  # Re-raise to let caller handle it

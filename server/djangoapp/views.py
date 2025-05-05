@@ -93,12 +93,22 @@ def get_cars(request):
 # def get_dealerships(request):
 ##Update the `get_dealerships` render list of dealerships all by default, particular state if state is passed
 def get_dealerships(request, state="All"):
-    if(state == "All"):
-        endpoint = "/fetchDealers"
-    else:
-        endpoint = "/fetchDealers/"+state
-    dealerships = get_request(endpoint)
-    return JsonResponse({"status":200,"dealers":dealerships})
+    try:
+        if(state == "All"):
+            endpoint = "/fetchDealers"
+        else:
+            endpoint = "/fetchDealers/"+state
+        
+        dealerships = get_request(endpoint)
+        
+        # Check if dealerships is None or empty
+        if not dealerships:
+            return JsonResponse({"status":404, "message":"No dealers found", "dealers":[]})
+            
+        return JsonResponse({"status":200, "dealers":dealerships})
+    except Exception as e:
+        logger.error(f"Error fetching dealerships: {str(e)}")
+        return JsonResponse({"status":500, "message":f"Error fetching dealerships: {str(e)}", "dealers":[]})
 
 # Create a `get_dealer_reviews` view to render the reviews of a dealer
 # def get_dealer_reviews(request,dealer_id):
